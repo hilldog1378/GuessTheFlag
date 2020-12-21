@@ -22,10 +22,13 @@ struct ContentView: View {
         "US"
     ].shuffled()
     
-    @State private var correctAnswer = Int.random(in: 0...2)
+    @State private var flagNumber = 4
+    @State private var correctAnswer = Int.random(in: 0 ... 3)
     
     @State private var showingScore = false
     @State private var scoreTitle = ""
+    @State private var alertMessage = ""
+    @State private var userScore = 0
     
     var body: some View {
         ZStack {
@@ -43,7 +46,7 @@ struct ContentView: View {
                         .fontWeight(.black)
                 }
                 
-                ForEach(0 ..< 3) { number in
+                ForEach(0 ..< flagNumber) { number in
                     Button(action: {
                         self.flagTapped(number)
                     }) {
@@ -53,11 +56,12 @@ struct ContentView: View {
                             .overlay(Capsule().stroke(Color.black, lineWidth: 1))
                             .shadow(color: .black, radius: 2)                    }
                 }
+                Label("Your Score: \(userScore)", systemImage: "person.crop.circle").foregroundColor(.white)
                 Spacer()
             }
         }
         .alert(isPresented: $showingScore) {
-            Alert(title: Text(scoreTitle), message: Text("Your score is ???"), dismissButton: .default(Text("Continue")) {
+            Alert(title: Text(scoreTitle), message: Text("\(alertMessage)"), dismissButton: .default(Text("Continue")) {
             self.askQuestion()
             })
             }
@@ -67,8 +71,11 @@ struct ContentView: View {
     func flagTapped(_ number: Int) {
         if number == correctAnswer {
             scoreTitle = "Correct"
+            userScore += 1
+            alertMessage = "Your score is \(userScore)"
         } else {
             scoreTitle = "False"
+            alertMessage = "Wrong! That's the flag of \(countries[number])"
         }
         
         showingScore = true
@@ -76,7 +83,7 @@ struct ContentView: View {
     
     func askQuestion() {
         countries.shuffle()
-        correctAnswer = Int.random(in: 0...2)
+        correctAnswer = Int.random(in: 0 ..< (flagNumber))
     }
 
 }
